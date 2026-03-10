@@ -261,7 +261,7 @@
 .helmet-holder {
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: 47%;
   z-index: 6;
   margin: 0;
   touch-action: none;
@@ -283,11 +283,10 @@
 }
 
 .helmet-parallax img {
-  width: min(84vw, 1480px);
+  width: min(92vw, 1620px);
   max-width: 100%;
-  max-height: 98vh;
+  max-height: 99vh;
   object-fit: contain;
-  animation: helmet-reveal 420ms ease;
   -webkit-user-drag: none;
   user-select: none;
   transform: translateZ(0);
@@ -405,6 +404,11 @@
   align-items: center;
   justify-content: center;
   gap: 0.52rem;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   transition:
@@ -481,7 +485,7 @@
 }
 
 .nav-btn:disabled {
-  cursor: wait;
+  cursor: default;
   opacity: 0.56;
   border-color: rgba(255, 255, 255, 0.18);
   background: rgba(15, 8, 31, 0.38);
@@ -496,18 +500,6 @@
   transform: none;
 }
 
-@keyframes helmet-reveal {
-  from {
-    opacity: 0;
-    transform: translateY(12px) scale(0.98);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
 @media (max-width: 1380px) {
   .card-copy {
     max-width: min(40%, 500px);
@@ -518,7 +510,7 @@
   }
 
   .helmet-parallax img {
-    width: min(92vw, 1420px);
+    width: min(100vw, 1560px);
   }
 }
 
@@ -545,8 +537,8 @@
   }
 
   .helmet-parallax img {
-    width: min(106vw, 1320px);
-    max-height: 88vh;
+    width: min(114vw, 1420px);
+    max-height: 90vh;
   }
 
   .plus-right {
@@ -559,6 +551,10 @@
 }
 
 @media (max-width: 960px) {
+  .helmet-holder {
+    top: 47.8%;
+  }
+
   .hero-card {
     height: calc(100dvh - 1rem);
     padding: 0.9rem;
@@ -582,8 +578,8 @@
   }
 
   .helmet-parallax img {
-    width: min(132vw, 1180px);
-    max-height: 76vh;
+    width: min(140vw, 1280px);
+    max-height: 78vh;
   }
 
   .card-footer {
@@ -592,6 +588,10 @@
 }
 
 @media (max-width: 760px) {
+  .helmet-holder {
+    top: 48.2%;
+  }
+
   .hero-card::after {
     width: min(92vw, 520px);
     opacity: 0.24;
@@ -646,8 +646,8 @@
   }
 
   .helmet-parallax img {
-    width: min(164vw, 1040px);
-    max-height: 63vh;
+    width: min(174vw, 1120px);
+    max-height: 66vh;
   }
 
   .card-footer {
@@ -691,6 +691,10 @@
 }
 
 @media (max-width: 560px) {
+  .helmet-holder {
+    top: 48.4%;
+  }
+
   .hero-card::after {
     width: min(112vw, 460px);
     opacity: 0.2;
@@ -727,8 +731,8 @@
   }
 
   .helmet-parallax img {
-    width: min(188vw, 900px);
-    max-height: 56vh;
+    width: min(198vw, 980px);
+    max-height: 59vh;
   }
 
   .card-footer {
@@ -760,7 +764,7 @@
   }
 
   .helmet-parallax img {
-    width: min(202vw, 820px);
+    width: min(214vw, 900px);
   }
 
   .nav-label {
@@ -770,6 +774,10 @@
 }
 
 @media (max-height: 780px) and (orientation: landscape) {
+  .helmet-holder {
+    top: 46.8%;
+  }
+
   .hero-stage {
     padding: 0.32rem;
   }
@@ -805,8 +813,8 @@
   }
 
   .helmet-parallax img {
-    width: min(70vw, 860px);
-    max-height: 72vh;
+    width: min(76vw, 980px);
+    max-height: 74vh;
   }
 
   .card-footer {

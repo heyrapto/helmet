@@ -126,6 +126,24 @@ function App() {
     deltaY: 0,
   })
 
+  useLayoutEffect(() => {
+    const perfTargets = [
+      stageRef.current,
+      cardRef.current,
+      parallaxRef.current,
+      helmetRef.current,
+      copyRef.current,
+      footerRef.current,
+      menuRef.current,
+      dotsRef.current,
+      washRef.current,
+    ].filter(Boolean)
+
+    if (perfTargets.length > 0) {
+      gsap.set(perfTargets, { force3D: true })
+    }
+  }, [])
+
   useEffect(() => {
     const preload = helmets.map((helmet) => {
       const image = new Image()
@@ -185,7 +203,7 @@ function App() {
     timelineRef.current?.kill()
 
     const tl = gsap.timeline({
-      defaults: { ease: 'power3.out' },
+      defaults: { ease: 'power3.out', overwrite: 'auto' },
       onComplete: () => {
         setIsAnimating(false)
       },
@@ -193,18 +211,18 @@ function App() {
 
     tl.fromTo(
       cardRef.current,
-      { rotate: direction * 0.6, scale: 0.985 },
-      { rotate: 0, scale: 1, duration: 0.82, ease: 'power2.out' },
+      { rotate: direction * 0.34, scale: 0.992 },
+      { rotate: 0, scale: 1, duration: 0.9, ease: 'sine.out' },
       0,
     )
       .fromTo(
         helmetRef.current,
         {
           autoAlpha: 0,
-          x: direction * 220,
-          y: 16,
-          scale: 1.22,
-          rotate: direction * 14,
+          x: direction * 170,
+          y: 10,
+          scale: 1.09,
+          rotate: direction * 7,
         },
         {
           autoAlpha: 1,
@@ -212,37 +230,37 @@ function App() {
           y: 0,
           scale: 1,
           rotate: 0,
-          duration: 1.04,
-          ease: 'expo.out',
+          duration: 1.08,
+          ease: 'power3.out',
         },
-        0.04,
+        0.06,
       )
       .fromTo(
         [copyRef.current, footerRef.current],
-        { autoAlpha: 0, x: direction * 54, y: 18 },
+        { autoAlpha: 0, x: direction * 40, y: 10 },
         {
           autoAlpha: 1,
           x: 0,
           y: 0,
-          duration: 0.78,
-          stagger: 0.08,
-          ease: 'power4.out',
+          duration: 0.82,
+          stagger: 0.07,
+          ease: 'power3.out',
         },
-        0.18,
+        0.16,
       )
       .fromTo(
         [menuRef.current, dotsRef.current],
-        { autoAlpha: 0, x: direction * 24 },
-        { autoAlpha: 1, x: 0, duration: 0.58, stagger: 0.05 },
-        0.24,
+        { autoAlpha: 0, x: direction * 18 },
+        { autoAlpha: 1, x: 0, duration: 0.66, stagger: 0.05 },
+        0.22,
       )
       .fromTo(
         washRef.current,
-        { autoAlpha: 0, scale: 0.55 },
-        { autoAlpha: 0.68, scale: 1.2, duration: 0.6, ease: 'sine.out' },
+        { autoAlpha: 0, scale: 0.82 },
+        { autoAlpha: 0.38, scale: 1.08, duration: 0.52, ease: 'sine.out' },
         0.08,
       )
-      .to(washRef.current, { autoAlpha: 0, duration: 0.46, ease: 'sine.in' }, 0.42)
+      .to(washRef.current, { autoAlpha: 0, duration: 0.56, ease: 'sine.in' }, 0.36)
 
     timelineRef.current = tl
   }
@@ -264,8 +282,9 @@ function App() {
     const nextIndex = (activeIndex + direction + helmets.length) % helmets.length
     const nextHelmet = helmets[nextIndex]
     const dragFactor = Math.min(Math.abs(dragDistance) / 260, 1)
-    const exitDuration = fromDrag ? 0.2 : 0.28
-    const exitDistance = (fromDrag ? 210 : 250) + dragFactor * 110
+    const exitDuration = fromDrag ? 0.26 : 0.34
+    const exitDistance = (fromDrag ? 180 : 220) + dragFactor * 85
+    const switchAt = exitDuration * 0.92
 
     directionRef.current = direction
     setIsAnimating(true)
@@ -281,42 +300,42 @@ function App() {
     }
 
     const tl = gsap.timeline({
-      defaults: { ease: 'power3.in' },
+      defaults: { ease: 'power2.inOut', overwrite: 'auto' },
       onComplete: commitSwitch,
     })
 
     tl.to(
       helmetRef.current,
       {
-        autoAlpha: 0.22,
+        autoAlpha: 0.18,
         x: -direction * exitDistance,
-        y: -9,
-        scale: 0.88,
-        rotate: -direction * 11,
+        y: -6,
+        scale: 0.92,
+        rotate: -direction * 7,
         duration: exitDuration,
-        ease: 'power4.in',
+        ease: 'power2.in',
       },
       0,
     )
       .to(
         [copyRef.current, footerRef.current],
         {
-          autoAlpha: 0.36,
-          x: -direction * 48,
-          y: -4,
-          duration: exitDuration * 0.9,
-          stagger: 0.05,
-          ease: 'power4.in',
+          autoAlpha: 0.26,
+          x: -direction * 36,
+          y: -2,
+          duration: exitDuration * 0.88,
+          stagger: 0.04,
+          ease: 'sine.in',
         },
-        0.02,
+        0.03,
       )
       .to(
         [menuRef.current, dotsRef.current],
         {
-          autoAlpha: 0.28,
-          x: -direction * 14,
-          duration: exitDuration * 0.8,
-          ease: 'power4.in',
+          autoAlpha: 0.2,
+          x: -direction * 11,
+          duration: exitDuration * 0.84,
+          ease: 'sine.in',
         },
         0,
       )
@@ -328,10 +347,10 @@ function App() {
           '--card-end': nextHelmet.cardEnd,
           '--helmet-halo': nextHelmet.halo,
           '--helmet-accent': nextHelmet.accent,
-          rotate: direction * 0.44,
-          scale: 0.988,
-          duration: exitDuration + 0.1,
-          ease: 'sine.in',
+          rotate: direction * 0.22,
+          scale: 0.994,
+          duration: exitDuration,
+          ease: 'sine.inOut',
         },
         0,
       )
@@ -340,8 +359,8 @@ function App() {
         {
           '--stage-glow-a': nextHelmet.stageGlowA,
           '--stage-glow-b': nextHelmet.stageGlowB,
-          duration: exitDuration + 0.1,
-          ease: 'sine.in',
+          duration: exitDuration,
+          ease: 'sine.inOut',
         },
         0,
       )
@@ -351,28 +370,28 @@ function App() {
           x: 0,
           y: 0,
           rotate: 0,
-          duration: exitDuration,
-          ease: 'power2.inOut',
+          duration: exitDuration * 0.82,
+          ease: 'sine.inOut',
         },
         0,
       )
       .fromTo(
         washRef.current,
-        { autoAlpha: 0, scale: 0.65 },
+        { autoAlpha: 0, scale: 0.86 },
         {
-          autoAlpha: 0.72,
-          scale: 1.68,
-          duration: exitDuration + 0.06,
+          autoAlpha: 0.44,
+          scale: 1.36,
+          duration: exitDuration * 0.8,
           ease: 'sine.out',
         },
         0,
       )
       .to(
         washRef.current,
-        { autoAlpha: 0, duration: exitDuration * 0.82, ease: 'sine.in' },
-        exitDuration * 0.45,
+        { autoAlpha: 0, duration: exitDuration * 0.52, ease: 'sine.in' },
+        exitDuration * 0.34,
       )
-      .add(commitSwitch, exitDuration * 0.72)
+      .add(commitSwitch, switchAt)
 
     timelineRef.current = tl
   }
