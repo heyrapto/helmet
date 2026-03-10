@@ -210,14 +210,14 @@
 .card-footer,
 .card-menu,
 .card-dots,
-.helmet-holder img {
-  will-change: transform, opacity, filter;
+.helmet-parallax img {
+  will-change: transform, opacity;
 }
 
 .helmet-holder {
   position: absolute;
-  left: 53%;
-  top: 51%;
+  left: 50%;
+  top: 50%;
   z-index: 6;
   margin: 0;
   touch-action: none;
@@ -233,6 +233,9 @@
   will-change: transform;
   display: grid;
   place-items: center;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .helmet-parallax img {
@@ -243,6 +246,9 @@
   animation: helmet-reveal 420ms ease;
   -webkit-user-drag: none;
   user-select: none;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   filter: drop-shadow(0 2.8rem 3.9rem rgba(0, 0, 0, 0.72))
     drop-shadow(0 0 3.4rem var(--helmet-accent));
 }
@@ -465,10 +471,6 @@
     right: clamp(4.8rem, 10vw, 8rem);
   }
 
-  .helmet-holder {
-    left: 53.4%;
-  }
-
   .helmet-parallax img {
     width: min(92vw, 1420px);
   }
@@ -489,10 +491,6 @@
 
   .card-copy {
     max-width: min(46%, 470px);
-  }
-
-  .helmet-holder {
-    left: 55%;
   }
 
   .helmet-parallax img {
@@ -530,11 +528,6 @@
 
   .card-copy h1 {
     font-size: clamp(1.82rem, 6.2vw, 3.05rem);
-  }
-
-  .helmet-holder {
-    left: 54.8%;
-    top: 48.5%;
   }
 
   .helmet-parallax img {
@@ -594,11 +587,6 @@
 
   .card-copy p {
     max-width: 34ch;
-  }
-
-  .helmet-holder {
-    left: 52%;
-    top: 45.5%;
   }
 
   .helmet-parallax img {
@@ -677,10 +665,6 @@
     font-size: 0.74rem;
   }
 
-  .helmet-holder {
-    top: 44.6%;
-  }
-
   .helmet-parallax img {
     width: min(188vw, 900px);
     max-height: 56vh;
@@ -757,11 +741,6 @@
   .card-copy p {
     font-size: 0.69rem;
     margin-top: 0.46rem;
-  }
-
-  .helmet-holder {
-    left: 55%;
-    top: 49%;
   }
 
   .helmet-parallax img {

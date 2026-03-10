@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import './App.css'
 
@@ -126,6 +126,21 @@ function App() {
     deltaY: 0,
   })
 
+  useEffect(() => {
+    const preload = helmets.map((helmet) => {
+      const image = new Image()
+      image.decoding = 'async'
+      image.src = helmet.image
+      return image
+    })
+
+    return () => {
+      preload.forEach((image) => {
+        image.src = ''
+      })
+    }
+  }, [])
+
   const resetDragVisuals = (duration = 0.32) => {
     gsap.to(helmetRef.current, {
       x: 0,
@@ -190,7 +205,6 @@ function App() {
           y: 16,
           scale: 1.22,
           rotate: direction * 14,
-          filter: 'blur(16px)',
         },
         {
           autoAlpha: 1,
@@ -198,7 +212,6 @@ function App() {
           y: 0,
           scale: 1,
           rotate: 0,
-          filter: 'blur(0px)',
           duration: 1.04,
           ease: 'expo.out',
         },
@@ -269,7 +282,6 @@ function App() {
         y: -14,
         scale: 0.8,
         rotate: -direction * 16,
-        filter: 'blur(16px)',
         duration: 0.52,
       },
       0,
@@ -340,6 +352,39 @@ function App() {
 
     timelineRef.current = tl
   }
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (isAnimating) {
+        return
+      }
+
+      if (event.target instanceof HTMLElement) {
+        const tag = event.target.tagName
+        if (
+          event.target.isContentEditable ||
+          tag === 'INPUT' ||
+          tag === 'TEXTAREA' ||
+          tag === 'SELECT'
+        ) {
+          return
+        }
+      }
+
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault()
+        switchHelmet(-1)
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault()
+        switchHelmet(1)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isAnimating, activeIndex])
 
   const handlePointerDown = (event) => {
     if (isAnimating) {
