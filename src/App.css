@@ -242,11 +242,18 @@
   color: #fff;
 }
 
+.card-copy h1 span {
+  display: block;
+  transform-origin: 0% 60%;
+  will-change: transform, opacity, filter;
+}
+
 .card-copy p {
   margin: 0.7rem 0 0;
   font-size: clamp(0.72rem, 0.96vw, 0.92rem);
   color: rgba(239, 231, 255, 0.79);
   line-height: 1.32;
+  will-change: transform, opacity, filter;
 }
 
 .card-copy,
@@ -324,6 +331,7 @@
   letter-spacing: 0.08em;
   font-size: clamp(0.67rem, 0.8vw, 0.82rem);
   color: rgba(239, 232, 255, 0.78);
+  will-change: transform, opacity, filter;
 }
 
 .card-footer strong {

@@ -111,6 +111,9 @@ function App() {
   const menuRef = useRef(null)
   const dotsRef = useRef(null)
   const copyRef = useRef(null)
+  const titleLine1Ref = useRef(null)
+  const titleLine2Ref = useRef(null)
+  const subtitleRef = useRef(null)
   const helmetRef = useRef(null)
   const footerRef = useRef(null)
   const washRef = useRef(null)
@@ -123,16 +126,26 @@ function App() {
   const idleMaskTlRef = useRef(null)
   const idleRestartCallRef = useRef(null)
   const quickFnsRef = useRef(null)
+  const dragSettersRef = useRef(null)
   const readyIndexSetRef = useRef(new Set())
   const enterRunRef = useRef(0)
   const dragStateRef = useRef({
     active: false,
     pointerId: null,
+    queueOnly: false,
+    queued: false,
+    axisLocked: false,
+    horizontalIntent: false,
+    moved: false,
     startX: 0,
     startY: 0,
     deltaX: 0,
     deltaY: 0,
+    lastX: 0,
+    lastTime: 0,
+    velocityX: 0,
   })
+  const nextEnterRapidRef = useRef(false)
 
   useLayoutEffect(() => {
     const maskTargets = [helmetRef.current, parallaxRef.current, washRef.current].filter(Boolean)
@@ -177,6 +190,20 @@ function App() {
           duration: 0.32,
           ease: 'power2.out',
         }),
+      }
+
+      dragSettersRef.current = {
+        helmetX: gsap.quickSetter(helmetRef.current, 'x', 'px'),
+        helmetRotate: gsap.quickSetter(helmetRef.current, 'rotate', 'deg'),
+        helmetScale: gsap.quickSetter(helmetRef.current, 'scale'),
+        copyX: gsap.quickSetter(copyRef.current, 'x', 'px'),
+        footerX: gsap.quickSetter(footerRef.current, 'x', 'px'),
+        menuX: gsap.quickSetter(menuRef.current, 'x', 'px'),
+        dotsX: gsap.quickSetter(dotsRef.current, 'x', 'px'),
+        cardRotate: gsap.quickSetter(cardRef.current, 'rotate', 'deg'),
+        cardScale: gsap.quickSetter(cardRef.current, 'scale'),
+        washAlpha: gsap.quickSetter(washRef.current, 'autoAlpha'),
+        washScale: gsap.quickSetter(washRef.current, 'scale'),
       }
     }
   }, [])
@@ -232,6 +259,7 @@ function App() {
       idleMaskTlRef.current?.kill()
       idleRestartCallRef.current?.kill()
       quickFnsRef.current = null
+      dragSettersRef.current = null
     }
   }, [])
 
@@ -239,6 +267,9 @@ function App() {
     const targets = [
       helmetRef.current,
       copyRef.current,
+      titleLine1Ref.current,
+      titleLine2Ref.current,
+      subtitleRef.current,
       footerRef.current,
       menuRef.current,
       dotsRef.current,
@@ -272,6 +303,16 @@ function App() {
     })
   }
 
+  const getSwipeMetrics = () => {
+    const cardWidth = cardRef.current?.clientWidth ?? window.innerWidth ?? 1280
+    return {
+      lockDistance: Math.max(12, Math.min(cardWidth * 0.022, 24)),
+      travelDistance: Math.max(130, Math.min(cardWidth * 0.26, 300)),
+      switchDistance: Math.max(56, Math.min(cardWidth * 0.11, 130)),
+      velocityThreshold: 0.5,
+    }
+  }
+
   const setBaseVisualState = () => {
     if (helmetRef.current) {
       gsap.set(helmetRef.current, {
@@ -290,9 +331,30 @@ function App() {
     if (copyTargets.length > 0) {
       gsap.set(copyTargets, { x: 0, y: 0, autoAlpha: 1, force3D: false })
     }
+    if (footerRef.current) {
+      gsap.set(footerRef.current, { filter: 'blur(0px)', force3D: false })
+    }
 
     if (cardRef.current) {
       gsap.set(cardRef.current, { rotate: 0, scale: 1, force3D: false })
+    }
+    const titleTargets = [titleLine1Ref.current, titleLine2Ref.current].filter(Boolean)
+    if (titleTargets.length > 0) {
+      gsap.set(titleTargets, {
+        y: 0,
+        autoAlpha: 1,
+        skewY: 0,
+        filter: 'blur(0px)',
+        force3D: false,
+      })
+    }
+    if (subtitleRef.current) {
+      gsap.set(subtitleRef.current, {
+        y: 0,
+        autoAlpha: 1,
+        filter: 'blur(0px)',
+        force3D: false,
+      })
     }
     if (washRef.current) {
       gsap.set(washRef.current, { autoAlpha: 0, scale: 1 })
@@ -445,10 +507,12 @@ function App() {
   }
 
   const playEnterAnimation = (direction, onDone) => {
-    const rapidMode = queuedSwitchRef.current !== 0
-    const cardInDuration = rapidMode ? 0.42 : 0.72
-    const helmetInDuration = rapidMode ? 0.5 : 0.86
-    const copyInDuration = rapidMode ? 0.42 : 0.66
+    const rapidMode = queuedSwitchRef.current !== 0 || nextEnterRapidRef.current
+    nextEnterRapidRef.current = false
+    const cardInDuration = rapidMode ? 0.38 : 0.72
+    const helmetInDuration = rapidMode ? 0.48 : 0.9
+    const titleInDuration = rapidMode ? 0.34 : 0.62
+    const metaInDuration = rapidMode ? 0.3 : 0.5
 
     transitionPhaseRef.current = 'enter'
     killMotionTweens()
@@ -467,7 +531,7 @@ function App() {
 
     tl.fromTo(
       cardRef.current,
-      { rotate: direction * 0.34, scale: 0.992 },
+      { rotate: direction * 0.4, scale: 0.987 },
       { rotate: 0, scale: 1, duration: cardInDuration, ease: 'sine.out' },
       0,
     )
@@ -475,10 +539,10 @@ function App() {
         helmetRef.current,
         {
           autoAlpha: 0.001,
-          x: direction * 170,
-          y: 10,
-          scale: 1.05,
-          rotate: direction * 1.8,
+          x: direction * 230,
+          y: 24,
+          scale: 1,
+          rotate: direction * 4,
         },
         {
           autoAlpha: 1,
@@ -487,28 +551,61 @@ function App() {
           scale: 1,
           rotate: 0,
           duration: helmetInDuration,
-          ease: 'power3.out',
+          ease: 'expo.out',
         },
-        rapidMode ? 0 : 0.03,
+        rapidMode ? 0 : 0.01,
       )
       .fromTo(
-        [copyRef.current, footerRef.current],
-        { autoAlpha: 0, x: direction * 40, y: 10 },
+        copyRef.current,
+        { x: direction * 52 },
+        { x: 0, duration: titleInDuration, ease: 'power3.out' },
+        rapidMode ? 0.04 : 0.14,
+      )
+      .fromTo(
+        [titleLine1Ref.current, titleLine2Ref.current],
+        { autoAlpha: 0, y: 44, skewY: direction * 4.5, filter: 'blur(11px)' },
         {
           autoAlpha: 1,
           x: 0,
           y: 0,
-          duration: copyInDuration,
+          skewY: 0,
+          filter: 'blur(0px)',
+          duration: titleInDuration,
           stagger: rapidMode ? 0.04 : 0.07,
-          ease: 'power3.out',
+          ease: 'expo.out',
         },
         rapidMode ? 0.08 : 0.16,
       )
       .fromTo(
+        subtitleRef.current,
+        { autoAlpha: 0, y: 24, filter: 'blur(9px)' },
+        {
+          autoAlpha: 1,
+          y: 0,
+          filter: 'blur(0px)',
+          duration: metaInDuration,
+          ease: 'power3.out',
+        },
+        rapidMode ? 0.14 : 0.28,
+      )
+      .fromTo(
+        footerRef.current,
+        { autoAlpha: 0, x: direction * 34, y: 8, filter: 'blur(8px)' },
+        {
+          autoAlpha: 1,
+          x: 0,
+          y: 0,
+          filter: 'blur(0px)',
+          duration: metaInDuration,
+          ease: 'power3.out',
+        },
+        rapidMode ? 0.12 : 0.24,
+      )
+      .fromTo(
         [menuRef.current, dotsRef.current],
         { autoAlpha: 0, x: direction * 18 },
-        { autoAlpha: 1, x: 0, duration: rapidMode ? 0.32 : 0.56, stagger: 0.05 },
-        rapidMode ? 0.08 : 0.16,
+        { autoAlpha: 1, x: 0, duration: rapidMode ? 0.26 : 0.44, stagger: 0.05 },
+        rapidMode ? 0.12 : 0.24,
       )
       .fromTo(
         washRef.current,
@@ -526,6 +623,28 @@ function App() {
         { autoAlpha: 0, duration: rapidMode ? 0.22 : 0.5, ease: 'sine.in' },
         rapidMode ? 0.14 : 0.3,
       )
+
+    if (!rapidMode) {
+      tl.to(
+        helmetRef.current,
+        {
+          y: -6,
+          scale: 1,
+          duration: 0.22,
+          ease: 'sine.out',
+        },
+        0.62,
+      ).to(
+        helmetRef.current,
+        {
+          y: 0,
+          scale: 1,
+          duration: 0.34,
+          ease: 'sine.inOut',
+        },
+        0.84,
+      )
+    }
 
     timelineRef.current = tl
   }
@@ -561,17 +680,25 @@ function App() {
   }, [activeIndex])
 
   const runExitTransition = (direction, options = {}) => {
-    const { fromDrag = false, dragDistance = 0, rapid = false } = options
+    const { fromDrag = false, dragDistance = 0, dragVelocity = 0, rapid = false } = options
     const nextIndex = (activeIndexRef.current + direction + helmets.length) % helmets.length
     const nextHelmet = helmets[nextIndex]
     const cardWidth = cardRef.current?.clientWidth ?? 1280
     const dragFactor = Math.min(Math.abs(dragDistance) / 260, 1)
-    const exitDuration = fromDrag ? 0.22 : rapid ? 0.18 : 0.26
+    const velocityFactor = Math.min(Math.abs(dragVelocity) / 1.6, 1)
+    const exitDuration = fromDrag
+      ? 0.19 - velocityFactor * 0.09
+      : rapid
+        ? 0.18
+        : 0.26
     const baseExit = Math.max(cardWidth * 0.4, fromDrag ? 240 : rapid ? 290 : 320)
-    const exitDistance = baseExit + dragFactor * 90
+    const exitDistance = baseExit + dragFactor * 90 + velocityFactor * 42
 
     killMotionTweens()
     stopIdleMaskAnimation(false)
+    if (fromDrag || rapid) {
+      nextEnterRapidRef.current = true
+    }
     directionRef.current = direction
     isTransitioningRef.current = true
     transitionPhaseRef.current = 'exit'
@@ -616,7 +743,7 @@ function App() {
       .to(
         [copyRef.current, footerRef.current],
         {
-          autoAlpha: 0.26,
+          autoAlpha: 0.44,
           x: -direction * 36,
           y: -2,
           duration: exitDuration * 0.88,
@@ -624,6 +751,30 @@ function App() {
           ease: 'sine.in',
         },
         0.03,
+      )
+      .to(
+        [titleLine1Ref.current, titleLine2Ref.current],
+        {
+          autoAlpha: 0,
+          y: -22,
+          skewY: -direction * 4,
+          filter: 'blur(9px)',
+          duration: exitDuration * 0.72,
+          stagger: 0.03,
+          ease: 'power2.in',
+        },
+        0,
+      )
+      .to(
+        subtitleRef.current,
+        {
+          autoAlpha: 0,
+          y: -14,
+          filter: 'blur(8px)',
+          duration: exitDuration * 0.64,
+          ease: 'power2.in',
+        },
+        0.01,
       )
       .to(
         [menuRef.current, dotsRef.current],
@@ -703,6 +854,7 @@ function App() {
       processSwitchQueue({
         fromDrag: true,
         dragDistance: options.dragDistance ?? 0,
+        dragVelocity: options.dragVelocity ?? 0,
       })
       return
     }
@@ -747,10 +899,6 @@ function App() {
   }, [])
 
   const handlePointerDown = (event) => {
-    if (isTransitioningRef.current) {
-      return
-    }
-
     if (event.pointerType === 'mouse' && event.button !== 0) {
       return
     }
@@ -758,13 +906,26 @@ function App() {
     const dragState = dragStateRef.current
     dragState.active = true
     dragState.pointerId = event.pointerId
+    dragState.axisLocked = false
+    dragState.horizontalIntent = false
+    dragState.moved = false
     dragState.startX = event.clientX
     dragState.startY = event.clientY
     dragState.deltaX = 0
     dragState.deltaY = 0
+    dragState.lastX = event.clientX
+    dragState.lastTime = event.timeStamp || performance.now()
+    dragState.velocityX = 0
+    dragState.queueOnly = isTransitioningRef.current
+    dragState.queued = false
+
+    holderRef.current?.setPointerCapture?.(event.pointerId)
+    if (dragState.queueOnly) {
+      gsap.set(holderRef.current, { cursor: 'grab' })
+      return
+    }
 
     stopIdleMaskAnimation(false)
-    holderRef.current?.setPointerCapture?.(event.pointerId)
     gsap.set(holderRef.current, { cursor: 'grabbing' })
     gsap.to(parallaxRef.current, {
       x: 0,
@@ -781,29 +942,87 @@ function App() {
     if (
       !dragState.active ||
       dragState.pointerId !== event.pointerId ||
-      isTransitioningRef.current
+      (isTransitioningRef.current && !dragState.queueOnly)
     ) {
       return
     }
 
     dragState.deltaX = event.clientX - dragState.startX
     dragState.deltaY = event.clientY - dragState.startY
+    const swipeMetrics = getSwipeMetrics()
+    const absX = Math.abs(dragState.deltaX)
+    const absY = Math.abs(dragState.deltaY)
+
+    if (!dragState.axisLocked) {
+      if (absX < swipeMetrics.lockDistance && absY < swipeMetrics.lockDistance) {
+        return
+      }
+      dragState.axisLocked = true
+      dragState.horizontalIntent = absX > absY * 0.92
+      if (!dragState.horizontalIntent) {
+        return
+      }
+    }
+
+    if (!dragState.horizontalIntent) {
+      return
+    }
+
+    if (dragState.queueOnly) {
+      const now = event.timeStamp || performance.now()
+      const dt = Math.max(now - dragState.lastTime, 8)
+      const instantVelocityX = (event.clientX - dragState.lastX) / dt
+      dragState.velocityX = dragState.velocityX * 0.72 + instantVelocityX * 0.28
+      dragState.lastX = event.clientX
+      dragState.lastTime = now
+      dragState.moved = true
+
+      if (dragState.queued) {
+        return
+      }
+
+      const distanceTriggered = absX > swipeMetrics.switchDistance * 0.72
+      const velocityTriggered = Math.abs(dragState.velocityX) > swipeMetrics.velocityThreshold * 0.9
+      if (distanceTriggered || velocityTriggered) {
+        const intentX = absX > 6 ? dragState.deltaX : dragState.velocityX * 180
+        dragState.queued = true
+        switchHelmet(intentX < 0 ? 1 : -1, {
+          fromDrag: true,
+          dragDistance: dragState.deltaX,
+          dragVelocity: dragState.velocityX,
+        })
+      }
+      return
+    }
+
+    if (event.cancelable) {
+      event.preventDefault()
+    }
+
+    const now = event.timeStamp || performance.now()
+    const dt = Math.max(now - dragState.lastTime, 8)
+    const instantVelocityX = (event.clientX - dragState.lastX) / dt
+    dragState.velocityX = dragState.velocityX * 0.75 + instantVelocityX * 0.25
+    dragState.lastX = event.clientX
+    dragState.lastTime = now
+    dragState.moved = true
 
     const dragX = dragState.deltaX
-    const intensity = Math.min(Math.abs(dragX) / 220, 1)
-    const quick = quickFnsRef.current
-    if (quick) {
-      quick.helmetX(dragX * 0.45)
-      quick.helmetRotate(dragX * 0.016)
-      quick.helmetScale(1 + intensity * 0.045)
-      quick.copyX(dragX * 0.16)
-      quick.footerX(dragX * 0.16)
-      quick.menuX(dragX * 0.11)
-      quick.dotsX(dragX * 0.11)
-      quick.cardRotate(dragX * 0.008)
-      quick.cardScale(1 - Math.min(Math.abs(dragX) / 1700, 0.018))
-      quick.washAlpha(intensity * 0.48)
-      quick.washScale(0.94 + intensity * 0.95)
+    const progress = gsap.utils.clamp(-1, 1, dragX / swipeMetrics.travelDistance)
+    const intensity = Math.abs(progress)
+    const setters = dragSettersRef.current
+    if (setters) {
+      setters.helmetX(progress * 122)
+      setters.helmetRotate(progress * 4.2)
+      setters.helmetScale(1 + intensity * 0.06)
+      setters.copyX(progress * 54)
+      setters.footerX(progress * 54)
+      setters.menuX(progress * 32)
+      setters.dotsX(progress * 32)
+      setters.cardRotate(progress * 1.3)
+      setters.cardScale(1 - intensity * 0.028)
+      setters.washAlpha(Math.min(0.58, intensity * 0.6))
+      setters.washScale(0.96 + intensity * 1.06)
       return
     }
 
@@ -852,22 +1071,40 @@ function App() {
     holderRef.current?.releasePointerCapture?.(event.pointerId)
     gsap.set(holderRef.current, { cursor: 'grab' })
 
+    if (dragState.queueOnly) {
+      dragState.active = false
+      dragState.pointerId = null
+      dragState.queueOnly = false
+      return
+    }
+
     dragState.active = false
     dragState.pointerId = null
+    if (!dragState.moved || !dragState.horizontalIntent) {
+      resetDragVisuals(0.22, true)
+      return
+    }
 
-    const shouldSwitch =
-      Math.abs(dragState.deltaX) > 86 &&
-      Math.abs(dragState.deltaX) > Math.abs(dragState.deltaY) * 1.22
+    const swipeMetrics = getSwipeMetrics()
+    const absX = Math.abs(dragState.deltaX)
+    const absY = Math.abs(dragState.deltaY)
+    const absVelocityX = Math.abs(dragState.velocityX)
+    const distanceTriggered = absX > swipeMetrics.switchDistance && absX > absY * 1.06
+    const velocityTriggered =
+      absVelocityX > swipeMetrics.velocityThreshold && absX > absY * 0.72
+    const shouldSwitch = distanceTriggered || velocityTriggered
 
     if (shouldSwitch) {
-      switchHelmet(dragState.deltaX < 0 ? 1 : -1, {
+      const intentX = absX > 6 ? dragState.deltaX : dragState.velocityX * 180
+      switchHelmet(intentX < 0 ? 1 : -1, {
         fromDrag: true,
         dragDistance: dragState.deltaX,
+        dragVelocity: dragState.velocityX,
       })
       return
     }
 
-    resetDragVisuals(0.32, true)
+    resetDragVisuals(0.22, true)
   }
 
   const handleCardMouseMove = (event) => {
@@ -982,10 +1219,10 @@ function App() {
 
         <article ref={copyRef} className="card-copy">
           <h1>
-            <span>{activeHelmet.titleLine1}</span>
-            <span>{activeHelmet.titleLine2}</span>
+            <span ref={titleLine1Ref}>{activeHelmet.titleLine1}</span>
+            <span ref={titleLine2Ref}>{activeHelmet.titleLine2}</span>
           </h1>
-          <p>{activeHelmet.subtitle}</p>
+          <p ref={subtitleRef}>{activeHelmet.subtitle}</p>
         </article>
 
         <figure
