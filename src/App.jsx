@@ -5,7 +5,7 @@ import './App.css'
 const helmets = [
   {
     id: '01',
-    image: '/helmet-1.png',
+    image: '/helmet-5.png',
     alt: 'Adidas Dame 5 Black Panther Helmet',
     titleLine1: 'ADIDAS DAME 5',
     titleLine2: 'BLACK PANTHER HELMET',
@@ -24,7 +24,7 @@ const helmets = [
   },
   {
     id: '02',
-    image: '/helmet-2.png',
+    image: '/helmet-4.png',
     alt: 'Red sneaker lion helmet',
     titleLine1: 'SNEAKER MU',
     titleLine2: 'CRIMSON LION HELMET',
@@ -43,7 +43,7 @@ const helmets = [
   },
   {
     id: '03',
-    image: '/helmet-3.png',
+    image: '/helmet-2.png',
     alt: 'Blue TW03 helmet',
     titleLine1: 'TW03 SNEAKER',
     titleLine2: 'MASK',
@@ -62,7 +62,7 @@ const helmets = [
   },
   {
     id: '04',
-    image: '/helmet-4.png',
+    image: '/helmet-3.png',
     alt: 'Pink chrome sneaker mask',
     titleLine1: 'INFRARED',
     titleLine2: 'CHROME SNEAKER MASK',
@@ -81,7 +81,7 @@ const helmets = [
   },
   {
     id: '05',
-    image: '/helmet-5.png',
+    image: '/helmet-1.png',
     alt: 'Green hemp SB gas mask',
     titleLine1: 'HEMP SB',
     titleLine2: 'GAS MASK',
