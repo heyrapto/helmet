@@ -10,8 +10,8 @@ const helmets = [
     titleLine1: 'SECURE ACCESS',
     titleLine2: 'ENCRYPTION',
     subtitle: 'For protected systems from "Secure Layers" defense pack',
-    price: '$98,550.00',
-    cartPrice: '$54,800.00',
+    protocol: 'AES-256-GCM',
+    latency: '0.4ms',
     stampLeft: '130',
     stampRight: '147',
     cardStart: '#3b1788',
@@ -29,8 +29,8 @@ const helmets = [
     titleLine1: 'FIREWALL NODE',
     titleLine2: 'CRIMSON SHIELD HELMET',
     subtitle: 'Hardened red perimeter from the security-core archive',
-    price: '$250,990.00',
-    cartPrice: '$54,800.00',
+    protocol: 'RSA-4096-OAEP',
+    latency: '1.2ms',
     stampLeft: '203',
     stampRight: '200',
     cardStart: '#8a0e2a',
@@ -48,8 +48,8 @@ const helmets = [
     titleLine1: 'ID CORE V03',
     titleLine2: 'AUTH MASK',
     subtitle: 'The 168th secured identity layer',
-    price: '$12,300.00',
-    cartPrice: '$54,800.00',
+    protocol: 'ECC-256-ECDH',
+    latency: '0.8ms',
     stampLeft: '130',
     stampRight: '162',
     cardStart: '#0635a4',
@@ -67,8 +67,8 @@ const helmets = [
     titleLine1: 'INFRA SECURE',
     titleLine2: 'CHROME DATA MASK',
     subtitle: 'Rose-metal shell with enforced privacy layer systems',
-    price: '$42,860.00',
-    cartPrice: '$54,800.00',
+    protocol: 'CHACHA20-POLY1305',
+    latency: '1.9ms',
     stampLeft: '071',
     stampRight: '113',
     cardStart: '#7f3277',
@@ -86,8 +86,8 @@ const helmets = [
     titleLine1: 'GREEN NODE',
     titleLine2: 'DEFENSE MASK',
     subtitle: 'Built from 3 layered protection modules',
-    price: '$64,300.00',
-    cartPrice: '$54,800.00',
+    protocol: 'X25519-AES-GCM',
+    latency: '0.5ms',
     stampLeft: '220',
     stampRight: '181',
     cardStart: '#197745',
@@ -214,7 +214,7 @@ function App() {
 
   const decodeImage = (image) => {
     if (typeof image.decode === 'function') {
-      return image.decode().catch(() => {})
+      return image.decode().catch(() => { })
     }
 
     if (image.complete) {
@@ -1174,7 +1174,7 @@ function App() {
       <section
         ref={cardRef}
         className="hero-card"
-        aria-label="Helmet product hero"
+        aria-label="Secure Node hero"
         onMouseMove={handleCardMouseMove}
         onMouseLeave={handleCardMouseLeave}
         style={{
@@ -1186,14 +1186,14 @@ function App() {
         }}
       >
         <header className="card-header">
-          <span className="brand-mark">xploit</span>
-          <span className="share-label">Share Mask</span>
+          <span className="brand-mark">sec/CORE</span>
+          <span className="share-label">Network Status</span>
 
-          <div className="card-cart">
+          <div className="card-metrics">
             <span>
-              Cart <em>3</em>
+              Relays <em>{activeHelmet.stampLeft[0] || '3'}</em>
             </span>
-            <strong>{activeHelmet.cartPrice}</strong>
+            <strong>{activeHelmet.latency} Ping</strong>
           </div>
 
           <div className="card-lines" aria-hidden="true">
@@ -1203,13 +1203,13 @@ function App() {
         </header>
 
         <aside ref={menuRef} className="card-menu">
-          <span>Store</span>
-          <span className="active">Sneaker Masks</span>
-          <span>NFTs</span>
+          <span>Firewall</span>
+          <span className="active">Enclaves</span>
+          <span>Audit Logs</span>
         </aside>
 
-        <span className="card-stamp card-stamp-left">{activeHelmet.stampLeft}</span>
-        <span className="card-stamp card-stamp-right">{activeHelmet.stampRight}</span>
+        <span className="card-stamp card-stamp-left">SEQ:{activeHelmet.stampLeft}</span>
+        <span className="card-stamp card-stamp-right">PORT:{activeHelmet.stampRight}</span>
 
         <div ref={dotsRef} className="card-dots" aria-hidden="true">
           <span />
@@ -1248,8 +1248,8 @@ function App() {
         </figure>
 
         <footer ref={footerRef} className="card-footer">
-          <span>More info</span>
-          <strong>{activeHelmet.price}</strong>
+          <span>Security Protocol</span>
+          <strong>{activeHelmet.protocol}</strong>
         </footer>
 
         <span className="plus plus-left" aria-hidden="true" />
