@@ -1186,19 +1186,23 @@ function App() {
         }}
       >
         <header className="card-header">
-          <span className="brand-mark">sec/CORE</span>
-          <span className="share-label">Network Status</span>
-
-          <div className="card-metrics">
-            <span>
-              Relays <em>{activeHelmet.stampLeft[0] || '3'}</em>
-            </span>
-            <strong>{activeHelmet.latency} Ping</strong>
+          <div className="header-left">
+            <span className="brand-mark">sec/CORE</span>
+            <span className="share-label">Network Status</span>
           </div>
 
-          <div className="card-lines" aria-hidden="true">
-            <span />
-            <span />
+          <div className="header-right">
+            <div className="card-metrics">
+              <span>
+                Relays <em>{activeHelmet.stampLeft[0] || '3'}</em>
+              </span>
+              <strong>{activeHelmet.latency} Ping</strong>
+            </div>
+
+            <div className="card-lines" aria-hidden="true">
+              <span />
+              <span />
+            </div>
           </div>
         </header>
 
